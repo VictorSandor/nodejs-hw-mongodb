@@ -11,7 +11,7 @@ export async function initMongoConnection() {
     const cluster = env("MONGODB_CLUSTER_NAME");
 
     await mongoose.connect(
-      `mongodb+srv://dd:<db_password>@cluster0.afm9h.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
+      `mongodb+srv://${user}:${pwd}@${url}/${db}?retryWrites=true&w=majority&appName=${cluster}`
     );
     console.log("Mongo connection successfully established!");
   } catch (e) {
