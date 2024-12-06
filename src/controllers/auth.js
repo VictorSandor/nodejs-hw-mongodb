@@ -6,7 +6,6 @@ import {
   registerUser,
 } from "../services/auth.js";
 
-//register User controller
 
 export const registerController = async (req, res) => {
   const payload = req.body;
@@ -18,7 +17,6 @@ export const registerController = async (req, res) => {
     .json({ status: 201, message: "User successfully registred", data: user });
 };
 
-// login & logout User controller
 
 export const loginUserController = async (req, res) => {
   const session = await loginUser(req.body);
@@ -43,7 +41,6 @@ export const logoutUserController = async (req, res) => {
   res.status(204).send();
 };
 
-//** setup session (local function)
 
 const setupSession = (res, session) => {
   res.cookie("sessionId", session._id, {
@@ -57,7 +54,6 @@ const setupSession = (res, session) => {
   });
 };
 
-// refreshUserSession controller
 
 export const refreshUserSessionController = async (req, res) => {
   const session = await refreshUserSession({
