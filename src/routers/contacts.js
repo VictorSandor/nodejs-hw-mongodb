@@ -15,7 +15,15 @@ import {
 } from "../validation/contacts.js";
 import { isValidId } from "../middlewares/isValidId.js";
 
+import { authenticate } from "../middlewares/authenticate.js";
+
+import { authorization } from "../middlewares/authorization.js";
+
 const router = Router();
+
+router.use(authenticate);
+
+router.use(authorization);
 
 router.get("/contacts", ctrlWrapper(getAllContactsController));
 
