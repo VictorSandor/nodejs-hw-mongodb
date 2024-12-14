@@ -27,7 +27,7 @@ router.use(authorization);
 
 router.get("/", ctrlWrapper(getAllContactsController));
 
-router.get("/", isValidId, ctrlWrapper(getContactByIdController));
+router.get("/:contactId", isValidId, ctrlWrapper(getContactByIdController));
 
 router.post(
   "/",
