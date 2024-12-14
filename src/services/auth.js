@@ -1,55 +1,58 @@
-import { randomBytes } from "crypto";
-import bcrypt from "bcrypt";
 import createHttpError from "http-errors";
 import { UsersCollection } from "../db/models/user.js";
-import { SessionsCollection } from "../db/models/session.js";
-import { FIFTEEN_MINUTES, THIRTY_DAYS } from "../constants/index.js";
+import bcrypt from "bcrypt";
+import { randomBytes } from "crypto";
+import { FIFTEEN_MINUTES, ONE_MOUNTH } from "../constants/index.js";
+import { SessionCollection } from "../db/models/session.js";
 
-const createSession = (userId) => {
-  const accessToken = randomBytes(30).toString("base64");
-  const refreshToken = randomBytes(30).toString("base64");
+export const registerUser = async (payload) => {
+  const registredUser = await UsersCollection.findOne({ email: payload.email });
+  if (registredUser) throw createHttpError(409, "Email in use");
 
-  return {
-    userId,
-    accessToken,
-    refreshToken,
-    accessTokenValidUntil: new Date(Date.now() + FIFTEEN_MINUTES),
-    refreshTokenValidUntil: new Date(Date.now() + THIRTY_DAYS),
-  };
-};
-
-export const registerUser = async (userData) => {
-  const user = await UsersCollection.findOne({ email: userData.email });
-  if (user) throw createHttpError(409, "Email in use");
-
-  const encryptedPassword = await bcrypt.hash(userData.password, 10);
+  const encryptedPassword = await bcrypt.hash(payload.password, 10);
 
   return await UsersCollection.create({
-    ...userData,
+    ...payload,
     password: encryptedPassword,
   });
 };
 
-export const loginUser = async (userData) => {
-  const user = await UsersCollection.findOne({ email: userData.email });
-  if (!user) {
-    throw createHttpError(404, "User not found");
-  }
-  const isEqual = await bcrypt.compare(userData.password, user.password);
+export const loginUser = async (payload) => {
+  const user = await UsersCollection.findOne({ email: payload.email });
 
-  if (!isEqual) {
-    throw createHttpError(401, "Unauthorized");
-  }
+  if (!user) throw createHttpError(404, "User not found");
 
-  await SessionsCollection.deleteOne({ userId: user._id });
+  const isEqual = await bcrypt.compare(payload.password, user.password);
+  if (!isEqual) throw createHttpError(401, "Unauthorized");
 
-  const newSession = createSession(user._id);
+  await SessionCollection.deleteOne({ userId: user._id });
 
-  return await SessionsCollection.create(newSession);
+  const newSession = createSession();
+
+  return await SessionCollection.create({
+    userId: user._id,
+    ...newSession,
+  });
 };
 
-export const refreshUsersSession = async ({ sessionId, refreshToken }) => {
-  const session = await SessionsCollection.findOne({
+export const logoutUser = async (sessionId) => {
+  await SessionCollection.findOneAndDelete({ _id: sessionId });
+};
+
+const createSession = () => {
+  const accessToken = randomBytes(30).toString("base64");
+  const refreshToken = randomBytes(30).toString("base64");
+
+  return {
+    accessToken,
+    refreshToken,
+    accessTokenValidUntil: new Date(Date.now() + FIFTEEN_MINUTES),
+    refreshTokenValidUntil: new Date(Date.now() + ONE_MOUNTH),
+  };
+};
+
+export const refreshUserSession = async ({ sessionId, refreshToken }) => {
+  const session = await SessionCollection.findOne({
     _id: sessionId,
     refreshToken,
   });
@@ -58,24 +61,19 @@ export const refreshUsersSession = async ({ sessionId, refreshToken }) => {
     throw createHttpError(401, "Session not found");
   }
 
-  const isSessionTokenExpired =
-    new Date() > new Date(session.refreshTokenValidUntil);
+  const isSessionTokenValid =
+    new Date() < new Date(session.refreshTokenValidUntil);
 
-  if (isSessionTokenExpired) {
+  if (!isSessionTokenValid) {
     throw createHttpError(401, "Session token expired");
   }
 
-  const newSession = createSession(session.userId);
+  const newSession = createSession();
 
-  await SessionsCollection.deleteOne({ _id: sessionId, refreshToken });
+  await SessionCollection.findOneAndDelete({ _id: sessionId, refreshToken });
 
-  return await SessionsCollection.create(newSession);
-};
-
-export const logoutUser = async (sessionId) => {
-  if (!sessionId) {
-    throw createHttpError(400, "Session ID is required");
-  }
-
-  await SessionsCollection.deleteOne({ _id: sessionId });
+  return await SessionCollection.create({
+    userId: session.userId,
+    ...newSession,
+  });
 };

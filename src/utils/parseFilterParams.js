@@ -1,25 +1,30 @@
-const parseType = (type) => {
-  if (typeof type !== "string") return null;
-  const validTypes = ["work", "home", "personal"];
+const filterType = (type) => {
+  const isString = typeof type === "string";
+  if (!isString) return;
 
-  return validTypes.includes(type) ? type : null;
+  const isKnownType = ["work", "home", "personal"].includes(type);
+
+  if (isKnownType) return type;
 };
 
-const parseBoolean = (value) => {
-  if (typeof value !== "string") return null;
-  if (value.toLowerCase() === "true") return true;
-  if (value.toLowerCase() === "false") return false;
-  return null;
+const filterIsFavorite = (param) => {
+  const isString = typeof param === "string";
+
+  if (!isString) return;
+
+  const isBoolean = ["true", "false"].includes(param);
+
+  if (isBoolean) return param;
 };
 
 export const parseFilterParams = (query) => {
-  const { type, isFavorite } = query;
+  const { contactType, isFavourite } = query;
 
-  const parsedType = parseType(type);
-  const parsedIsFavorite = parseBoolean(isFavorite);
+  const parsedType = filterType(contactType);
+  const parsedIsFavourite = filterIsFavorite(isFavourite);
 
   return {
     type: parsedType,
-    isFavorite: parsedIsFavorite,
+    isFavourite: parsedIsFavourite,
   };
 };
