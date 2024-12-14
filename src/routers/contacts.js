@@ -1,62 +1,41 @@
 import { Router } from "express";
 import {
-  createContactController,
-  deleteContactController,
-  getAllContactsController,
+  getContactsController,
   getContactByIdController,
-  updateContactController,
-  upsertContactController,
+  createContactController,
+  patchContactController,
+  deleteContactController,
 } from "../controllers/contacts.js";
 import { ctrlWrapper } from "../utils/ctrlWrapper.js";
 import { validateBody } from "../middlewares/validateBody.js";
 import {
-  createContactsSchema,
+  createContactSchema,
   updateContactSchema,
 } from "../validation/contacts.js";
 import { isValidId } from "../middlewares/isValidId.js";
-
 import { authenticate } from "../middlewares/authenticate.js";
-
-import { authorization } from "../middlewares/authorization.js";
 
 const router = Router();
 
 router.use(authenticate);
 
-router.use(authorization);
+router.get("/", ctrlWrapper(getContactsController));
 
-router.get("/contacts", ctrlWrapper(getAllContactsController));
-
-router.get(
-  "/contacts/:contactId",
-  isValidId,
-  ctrlWrapper(getContactByIdController)
-);
+router.get("/:contactId", isValidId, ctrlWrapper(getContactByIdController));
 
 router.post(
-  "/contacts",
-  validateBody(createContactsSchema),
+  "/",
+  validateBody(createContactSchema),
   ctrlWrapper(createContactController)
 );
 
 router.patch(
-  "/contacts/:contactId",
+  "/:contactId",
   isValidId,
   validateBody(updateContactSchema),
-  ctrlWrapper(updateContactController)
+  ctrlWrapper(patchContactController)
 );
 
-router.delete(
-  "/contacts/:contactId",
-  isValidId,
-  ctrlWrapper(deleteContactController)
-);
-
-router.put(
-  "/contacts/:contactId",
-  isValidId,
-  validateBody(createContactsSchema),
-  ctrlWrapper(upsertContactController)
-);
+router.delete("/:contactId", isValidId, ctrlWrapper(deleteContactController));
 
 export default router;

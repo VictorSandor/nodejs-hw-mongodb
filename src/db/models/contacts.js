@@ -1,26 +1,38 @@
 import { model, Schema } from "mongoose";
-import { contactsTypeList } from "../../constants/index.js";
-import { handleSaveError, setupUpdateValidator } from "./hooks.js";
 
-const ContactsSchema = new Schema(
+const contactsSchema = new Schema(
   {
-    name: { type: String, required: true },
-    phoneNumber: { type: String, required: true },
-    email: { type: String },
-    isFavourite: { type: Boolean, default: false },
-    contactType: {
+    name: {
       type: String,
       required: true,
-      enum: contactsTypeList,
+    },
+    phoneNumber: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+    },
+    isFavorite: {
+      type: Boolean,
+      default: false,
+    },
+    contactType: {
+      type: String,
+      enum: ["work", "home", "personal"],
+      required: true,
       default: "personal",
     },
-    userId: { type: Schema.Types.ObjectId, ref: "users" },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "users",
+      required: true,
+    },
   },
-  { timestamps: true, versionKey: false }
+  {
+    timestamps: true,
+    versionKey: false,
+  }
 );
 
-ContactsSchema.post("save", handleSaveError);
-ContactsSchema.pre("findOneAndUpdate", setupUpdateValidator);
-ContactsSchema.post("findOneAndUpdate", handleSaveError);
-
-export const ContactsCollection = model("contacts", ContactsSchema);
+export const ContactsCollection = model("contacts", contactsSchema);

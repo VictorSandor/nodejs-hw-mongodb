@@ -10,19 +10,22 @@ import { parsePaginationParams } from "../utils/parsePaginationParams.js";
 import { parseSortParams } from "../utils/parseSortParams.js";
 import { parseFilterParams } from "../utils/parseFilterParams.js";
 
-export const getAllContactsController = async (req, res) => {
+export const getContactsController = async (req, res, _next) => {
+  const { _id: userId } = req.user;
+
   const { page, perPage } = parsePaginationParams(req.query);
-  const { sortOrder, sortBy } = parseSortParams(req.query);
+
+  const { sortBy, sortOrder } = parseSortParams(req.query);
+
   const filter = parseFilterParams(req.query);
-  const userId = req.user._id;
 
   const contacts = await getAllContacts({
+    userId,
     page,
     perPage,
-    sortOrder,
     sortBy,
+    sortOrder,
     filter,
-    userId,
   });
 
   res.status(200).json({
@@ -32,13 +35,14 @@ export const getAllContactsController = async (req, res) => {
   });
 };
 
-export const getContactByIdController = async (req, res) => {
+export const getContactByIdController = async (req, res, _next) => {
   const { contactId } = req.params;
-  const userId = req.user._id.toString();
-  const contact = await getContactById({ userId, contactId });
+  const { _id: userId } = req.user;
+
+  const contact = await getContactById(contactId, userId);
 
   if (!contact) {
-    throw createHttpError(404, `Contact with id ${contactId} not found`);
+    throw createHttpError(404, "Contact not found");
   }
 
   res.status(200).json({
@@ -49,74 +53,43 @@ export const getContactByIdController = async (req, res) => {
 };
 
 export const createContactController = async (req, res) => {
-  const body = req.body;
-  const userId = req.user._id;
+  const { _id: userId } = req.user;
 
-  const newContact = await createContact({ userId, body });
+  const contact = await createContact(req.body, userId);
 
   res.status(201).json({
     status: 201,
     message: "Successfully created a contact!",
-    data: newContact,
+    data: contact,
   });
 };
 
-export const updateContactController = async (req, res, next) => {
-  const { contactId: _id } = req.params;
-  const body = req.body;
-  const userId = req.user._id;
-  const options = {};
-  const updContact = await updateContact({ _id, body, options, userId });
+export const patchContactController = async (req, res) => {
+  const { contactId } = req.params;
+  const { _id: userId } = req.user;
 
-  if (updContact === null) {
-    next(createHttpError(404, `Contact with id ${_id} not found`));
-    return;
+  const updatedContact = await updateContact(contactId, req.body, userId);
+
+  if (!updatedContact) {
+    throw createHttpError(404, "Contact not found");
   }
 
   res.status(200).json({
     status: 200,
-    message: "Successfully patched a contact!",
-    data: updContact.contact,
+    message: `Successfully patched a contact!`,
+    data: updatedContact,
   });
 };
 
-export const deleteContactController = async (req, res, next) => {
-  const { contactId: _id } = req.params;
-  const userId = req.user._id;
+export const deleteContactController = async (req, res) => {
+  const { contactId } = req.params;
+  const { _id: userId } = req.user;
 
-  const deletedContact = await deleteContact({ _id, userId });
+  const contact = await deleteContact(contactId, userId);
 
-  if (!deletedContact) {
-    next(createHttpError(404, `Contact with id ${_id} not found`));
-    return;
+  if (!contact) {
+    throw createHttpError(404, "Contact not found");
   }
 
-  res.status(204).json({ status: 204 });
-};
-
-export const upsertContactController = async (req, res, next) => {
-  const { contactId: _id } = req.params;
-  const body = req.body;
-  const userId = req.user._id;
-
-  const options = { upsert: true };
-
-  const upsertContact = await updateContact({
-    _id,
-    body,
-    options,
-    userId,
-  });
-
-  if (!upsertContact) {
-    next(createHttpError(404, "Not found"));
-    return;
-  }
-
-  const status = upsertContact.isNew ? 201 : 200;
-  res.status(status).json({
-    status: status,
-    message: "`Successfully upserted a contact!`",
-    data: upsertContact.contact,
-  });
+  res.status(204).json();
 };
