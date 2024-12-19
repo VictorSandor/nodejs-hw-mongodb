@@ -13,11 +13,14 @@ import { SessionCollection } from "../db/models/session.js";
 import jwt from "jsonwebtoken";
 import { env } from "../utils/env.js";
 import { sendEmail } from "../utils/sendMail.js";
+import {
+  validateCode,
+  getUsernameFromGoogleTokenPayload,
+} from "../utils/googleOAuth2.js";
 
 import handlebars from "handlebars";
 import path from "node:path";
 import fs from "node:fs/promises";
-
 
 export const registerUser = async (payload) => {
   const registredUser = await UsersCollection.findOne({ email: payload.email });
@@ -30,7 +33,6 @@ export const registerUser = async (payload) => {
     password: encryptedPassword,
   });
 };
-
 
 export const loginUser = async (payload) => {
   const user = await UsersCollection.findOne({ email: payload.email });
@@ -54,7 +56,6 @@ export const logoutUser = async (sessionId) => {
   await SessionCollection.findOneAndDelete({ _id: sessionId });
 };
 
-
 const createSession = () => {
   const accessToken = randomBytes(30).toString("base64");
   const refreshToken = randomBytes(30).toString("base64");
@@ -66,7 +67,6 @@ const createSession = () => {
     refreshTokenValidUntil: new Date(Date.now() + ONE_MOUNTH),
   };
 };
-
 
 export const refreshUserSession = async ({ sessionId, refreshToken }) => {
   const session = await SessionCollection.findOne({
@@ -94,7 +94,6 @@ export const refreshUserSession = async ({ sessionId, refreshToken }) => {
     ...newSession,
   });
 };
-
 
 export const requestResetToken = async (email) => {
   const user = await UsersCollection.findOne({ email });
@@ -134,7 +133,6 @@ export const requestResetToken = async (email) => {
   });
 };
 
-
 export const resetPassword = async (payload) => {
   let entries;
 
@@ -164,4 +162,33 @@ export const resetPassword = async (payload) => {
   );
 
   await SessionCollection.findOneAndDelete({ userId: user._id });
+};
+
+export const loginOrRegisterWithGoogle = async (code) => {
+  const loginTicket = await validateCode(code);
+  const payload = loginTicket.getPayload();
+  if (!payload) {
+    throw createHttpError(401, "Unauthorized");
+  }
+
+  let user = await UsersCollection.findOne({
+    email: payload.email,
+  });
+  if (!user) {
+    const password = await bcrypt.hash(randomBytes(10), 10);
+    const username = getUsernameFromGoogleTokenPayload(payload);
+
+    user = await UsersCollection.create({
+      email: payload.email,
+      username,
+      password,
+    });
+
+    const newSession = createSession();
+
+    return await SessionCollection.create({
+      userId: user._id,
+      ...newSession,
+    });
+  }
 };
