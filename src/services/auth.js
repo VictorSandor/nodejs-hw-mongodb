@@ -18,7 +18,6 @@ import handlebars from "handlebars";
 import path from "node:path";
 import fs from "node:fs/promises";
 
-
 export const registerUser = async (payload) => {
   const registredUser = await UsersCollection.findOne({ email: payload.email });
   if (registredUser) throw createHttpError(409, "Email in use");
@@ -30,7 +29,6 @@ export const registerUser = async (payload) => {
     password: encryptedPassword,
   });
 };
-
 
 export const loginUser = async (payload) => {
   const user = await UsersCollection.findOne({ email: payload.email });
@@ -54,7 +52,6 @@ export const logoutUser = async (sessionId) => {
   await SessionCollection.findOneAndDelete({ _id: sessionId });
 };
 
-
 const createSession = () => {
   const accessToken = randomBytes(30).toString("base64");
   const refreshToken = randomBytes(30).toString("base64");
@@ -66,7 +63,6 @@ const createSession = () => {
     refreshTokenValidUntil: new Date(Date.now() + ONE_MOUNTH),
   };
 };
-
 
 export const refreshUserSession = async ({ sessionId, refreshToken }) => {
   const session = await SessionCollection.findOne({
@@ -95,7 +91,6 @@ export const refreshUserSession = async ({ sessionId, refreshToken }) => {
   });
 };
 
-
 export const requestResetToken = async (email) => {
   const user = await UsersCollection.findOne({ email });
 
@@ -107,7 +102,7 @@ export const requestResetToken = async (email) => {
       email,
     },
     env("JWT_SECRET"),
-    { expiresIn: "5m" }
+    { expiresIn: "15m" }
   );
 
   const resetPasswordTemplatePath = path.join(
@@ -133,7 +128,6 @@ export const requestResetToken = async (email) => {
     html,
   });
 };
-
 
 export const resetPassword = async (payload) => {
   let entries;
