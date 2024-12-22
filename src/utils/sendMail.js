@@ -1,5 +1,4 @@
 import nodemailer from "nodemailer";
-
 import { env } from "../utils/env.js";
 import { SMTP } from "../constants/index.js";
 

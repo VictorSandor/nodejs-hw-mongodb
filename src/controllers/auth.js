@@ -12,8 +12,6 @@ import {
 import createHttpError from "http-errors";
 import { generateAuthUrl } from "../utils/googleOAuth2.js";
 
-//register User controller
-
 export const registerController = async (req, res) => {
   const payload = req.body;
 
@@ -23,7 +21,6 @@ export const registerController = async (req, res) => {
     .status(201)
     .json({ status: 201, message: "User successfully registred", data: user });
 };
-
 
 export const loginUserController = async (req, res) => {
   const session = await loginUser(req.body);
@@ -51,8 +48,6 @@ export const logoutUserController = async (req, res) => {
   res.status(204).send();
 };
 
-//** setup session (local function)
-
 const setupSession = (res, session) => {
   res.cookie("sessionId", session._id, {
     httpOnly: true,
@@ -64,7 +59,6 @@ const setupSession = (res, session) => {
     expires: new Date(Date.now() + ONE_MOUNTH),
   });
 };
-
 
 export const refreshUserSessionController = async (req, res) => {
   const session = await refreshUserSession({
@@ -80,7 +74,6 @@ export const refreshUserSessionController = async (req, res) => {
     data: { accessToken: session.accessToken },
   });
 };
-
 
 export const sendResetEmailController = async (req, res) => {
   const result = await requestResetToken(req.body.email);
@@ -100,7 +93,6 @@ export const sendResetEmailController = async (req, res) => {
   });
 };
 
-
 export const resetPasswordController = async (req, res) => {
   await resetPassword(req.body);
 
@@ -110,7 +102,6 @@ export const resetPasswordController = async (req, res) => {
     data: {},
   });
 };
-
 
 export const getGoogleOAuthUrlController = async (req, res) => {
   const url = generateAuthUrl();
@@ -123,7 +114,6 @@ export const getGoogleOAuthUrlController = async (req, res) => {
     },
   });
 };
-
 
 export const loginWithGoogleController = async (req, res) => {
   const session = await loginOrRegisterWithGoogle(req.body.code);

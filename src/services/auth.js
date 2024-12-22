@@ -22,6 +22,8 @@ import handlebars from "handlebars";
 import path from "node:path";
 import fs from "node:fs/promises";
 
+// register User
+
 export const registerUser = async (payload) => {
   const registredUser = await UsersCollection.findOne({ email: payload.email });
   if (registredUser) throw createHttpError(409, "Email in use");
