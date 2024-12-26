@@ -10,5 +10,9 @@ const sessionSchema = new Schema(
   },
   { timestamps: true, versionKey: false }
 );
-
+sessionSchema.methods.toJSON = function () {
+  const obj = this.toObject();
+  delete obj.password;
+  return obj;
+};
 export const SessionCollection = model("sessions", sessionSchema);
