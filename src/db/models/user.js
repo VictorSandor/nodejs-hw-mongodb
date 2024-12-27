@@ -1,9 +1,15 @@
 import { Schema, model } from "mongoose";
+import bcrypt from "bcrypt";
 
 const userSchema = new Schema(
   {
     name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      match: [/^\S+@\S+\.\S+$/, "Invalid email format"],
+    },
     password: { type: String, required: true },
     optionalField: { type: String, required: false },
   },
@@ -14,6 +20,23 @@ userSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.password;
   return obj;
+};
+
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    console.error("Error hashing password:", error);
+    next(error);
+  }
+});
+
+userSchema.methods.comparePassword = async function (inputPassword) {
+  return bcrypt.compare(inputPassword, this.password);
 };
 
 export const UsersCollection = model("users", userSchema);
