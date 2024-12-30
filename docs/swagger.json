@@ -840,7 +840,6 @@
           "_id",
           "name",
           "phoneNumber",
-          "isFavourite",
           "contactType",
           "userId"
         ],
@@ -896,6 +895,7 @@
         "required": [
           "name",
           "email",
+           "_id",
           "password"
         ],
         "properties": {
@@ -913,6 +913,10 @@
             "description": "User's id",
             "type": "string",
             "example": "65e4decdd286b30065d54af9"
+          },
+          "password": {
+            "type": "string",
+             "format": "password"
           },
           "createdAt": {
             "type": "string",

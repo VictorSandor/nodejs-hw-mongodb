@@ -2,7 +2,7 @@ tags:
   - Contacts
 summary: Create contact
 operationId: createContact
-description: Create a new contact.
+description: "Create a contact with payload"
 security:
   - bearerAuth: []
 requestBody:
@@ -16,33 +16,33 @@ requestBody:
           - contactType
         properties:
           name:
+            description: "Contact's name"
             type: string
-            description: Full name of the contact.
             example: "John Doe"
           phoneNumber:
+            description: "Contact's phoneNumber"
             type: string
-            description: Contact's phone number.
-            example: "+123456789"
-          email:
-            type: string
-            description: Contact's email address.
-            example: "johndoe@example.com"
-          isFavorite:
-            type: boolean
-            description: Mark contact as favorite.
-            example: true
+            example: "+3800000000789"
           contactType:
+            description: "Contact's type"
             type: string
-            description: Type of contact.
-            enum: [work, home, personal]
-            example: "personal"
+            enum: ["work", "home", "personal"]
+          isFavourite:
+            description: "Whether is contact favourite"
+            type: boolean
+            example: false
+          email:
+            description: "Contact's email"
+            type: string
+            example: kat8@example.com
           photo:
+            description: "Contact's photo"
             type: string
             format: binary
-            description: Contact's photo file.
+            example: https://res.cloudinary.com/dzfjpbsml/image/upload/v1731587977/photo.png
 responses:
   "201":
-    description: Successfully created contact.
+    description: Creates a contact
     content:
       application/json:
         schema:
@@ -57,13 +57,9 @@ responses:
               example: 201
             message:
               type: string
-              example: "Successfully created a contact!"
+              example: Successfully created a contact!
             data:
               type: object
-              $ref: ../../components/schemas/contact.yaml
-  "400":
-    $ref: ../../components/responses/400.yaml
+              $ref: "../../components/schemas/contact.yaml"
   "401":
-    $ref: ../../components/responses/401.yaml
-  "500":
-    $ref: ../../components/responses/500.yaml
+    $ref: "../../components/responses/401.yaml"
