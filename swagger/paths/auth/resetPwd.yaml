@@ -1,0 +1,51 @@
+tags:
+  - Auth
+summary: Reset password
+operationId: requestPassword
+description: 'Reset password'
+security: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - token
+          - password
+        properties:
+          token:
+            description: JWT token received via email for password reset.
+            type: string
+            example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiZW1haWwiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNjcxMjM4ODAwfQ.wyDIz8nMKvXOpGfRmlCVJrU11A1IwFT4-NMIszq8R4o
+          password:
+            description: 'The new password for the user.'
+            type: string
+            example: NewSecureP@ssw0rd
+responses:
+  '200':
+    description: Request reset password
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+            - data
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Password has been successfully reset
+            data:
+              type: object
+              description: empty object
+  '401':
+    $ref: ../../components/responses/auth/401.yaml
+  '404':
+    $ref: ../../components/responses/auth/404.yaml
+  '500':
+    $ref: '../../components/responses/500.yaml'

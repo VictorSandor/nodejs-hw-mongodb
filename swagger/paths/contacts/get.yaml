@@ -2,7 +2,7 @@ tags:
   - Contacts
 summary: Get list of contacts
 operationId: getContacts
-description: 'Get list of contacts with this endpoint'
+description: 'Get list of contacts'
 security:
   - bearerAuth: []
 parameters:
@@ -10,7 +10,7 @@ parameters:
     name: page
     schema:
       type: integer
-      example: 1
+    example: 1
   - in: query
     name: perPage
     schema:
@@ -19,21 +19,9 @@ parameters:
   - in: query
     name: sortBy
     schema:
-      type: string
       enum:
-        [
-          '_id',
-          'name',
-          'phoneNumber',
-          'email',
-          'isFavourite',
-          'contactType',
-          'createdAt',
-          'updatedAt',
-        ]
+        ['_id', 'name', 'phoneNumber', 'email', 'isFavourite', 'contactType']
       example: 'name'
-      default: '_id'
-    description: "All contact's fields can be mentioned."
   - in: query
     name: sortOrder
     schema:
@@ -50,10 +38,10 @@ parameters:
     schema:
       type: string
       enum: ['work', 'home', 'personal']
-      example: 'work'
+      example: work
 responses:
   '200':
-    description: Successfully found contacts!
+    description: Successfully found contacts
     content:
       application/json:
         schema:
@@ -68,7 +56,7 @@ responses:
               example: 200
             message:
               type: string
-              example: Successfully found contacts!
+              example: Successfully found contacts
             data:
               type: object
               required:
@@ -86,13 +74,13 @@ responses:
                     $ref: ../../components/schemas/contact.yaml
                 page:
                   type: number
-                  example: 2
+                  example: 1
                 perPage:
                   type: number
-                  example: 4
+                  example: 3
                 totalItems:
                   type: number
-                  example: 8
+                  example: 2
                 totalPages:
                   type: number
                   example: 2
@@ -103,4 +91,4 @@ responses:
                   type: boolean
                   example: true
   '401':
-    $ref: '../../components/responses/401.yaml'
+    $ref: ../../components/responses/contacts/401.yaml

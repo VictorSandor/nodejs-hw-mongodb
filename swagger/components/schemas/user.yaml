@@ -1,26 +1,35 @@
 type: object
 required:
+  - _id
   - name
   - email
   - password
 properties:
+  _id:
+    description: "User id"
+    type: string
+    example: 675c8399c0dd8a4ccbe173fd
   name:
-    description: "User's name"
+    description: "user full name"
     type: string
     example: "John Doe"
   email:
-    description: "User's email"
+    description: "User email"
     type: string
-    example: kat8@example.com
-  _id:
-    description: "User's id"
+    example: john.doe@example.com
+  password:
+    description: "Hashed user password stored in the database"
     type: string
-    example: 65e4decdd286b30065d54af9
+    example: "$2b$10$ehfmT7JR9ypYhpGViQeeY.IeBX46h7r8IC5S0Xl2Q6UQ2Thn49gDS"
+  role:
+    description: "User role"
+    type: string
+    enum: ["user"]
   createdAt:
+    description: "Contacts createdAt"
     type: string
-    format: date-time
-    example: "2024-12-01T11:51:34.032Z"
-  updatedAt:
+    example: "2024-12-08T16:12:14.954182"
+  updateAt:
+    description: "Contacts updatedAt"
     type: string
-    format: date-time
-    example: "2024-12-01T12:00:00.000Z"
+    example: "2024-12-30T17:19:41.576+00:00"

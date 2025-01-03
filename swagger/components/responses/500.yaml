@@ -17,4 +17,4 @@ content:
         error:
           type: string
           description: Detailed error message for debugging purposes.
-          example: "Internal server error"
+          example: "Unexpected database error occurred"

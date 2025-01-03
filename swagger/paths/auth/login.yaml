@@ -2,7 +2,7 @@ tags:
   - Auth
 summary: Login user
 operationId: loginUser
-description: "Login a user with payload"
+description: 'Login User'
 security: []
 requestBody:
   content:
@@ -14,16 +14,16 @@ requestBody:
           - password
         properties:
           email:
-            description: "User's email"
+            description: 'User email'
             type: string
-            example: kat8@example.com
+            example: john.doe@example.com
           password:
-            description: "User's password"
+            description: 'User password'
             type: string
-            example: "123POI. Min 6 characters"
+            example: 12345pasS
 responses:
-  "200":
-    description: Logged a user
+  '200':
+    description: Logged in an user
     content:
       application/json:
         schema:
@@ -41,15 +41,12 @@ responses:
               example: Successfully logged in an user!
             data:
               type: object
-              required:
-                - accessToken
               properties:
                 accessToken:
+                  description: Access token
                   type: string
-                  example: "Y"
-  "401":
-    $ref: "../../../components/responses/401.yaml"
-  "404":
-    $ref: "../../../components/responses/404.yaml"
-  "500":
-    $ref: "../../../components/responses/500.yaml"
+                  example: 'TDn5k6dfU2zkjG4W6WW0NQJ2Vgl8QkGORZcGIK'
+  '401':
+    $ref: ../../components/responses/auth/401.yaml
+  '500':
+    $ref: '../../components/responses/500.yaml'
