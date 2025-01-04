@@ -1,48 +1,30 @@
 openapi: 3.1.0
 info:
   version: 1.0.0
-  title: Phonebook Node.js
+  title: Contacts
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  description: This is a documentation of contacts app
+  description: This is a documentation of Contacts
 tags:
   - name: Contacts
-    description: Operations with contacts
+    description: Operation with contacts
 servers:
-  - url: http://localhost:3000
+  - url: http://127.0.0.1:3000
   - url: https://nodejs-hw-mongodb-35-jbtk.onrender.com
 paths:
   /contacts:
-    get:
-      $ref: ../swagger/paths/contacts/get.yaml
     post:
       $ref: ../swagger/paths/contacts/post.yaml
+    get:
+      $ref: ../swagger/paths/contacts/get.yaml
   /contacts/{contactId}:
     get:
       $ref: ../swagger/paths/contacts/{contactId}/get.yaml
+    delete:
+      $ref: ../swagger/paths/contacts/{contactId}/del.yaml
     patch:
       $ref: ../swagger/paths/contacts/{contactId}/patch.yaml
-    delete:
-      $ref: ../swagger/paths/contacts/{contactId}/delete.yaml
-  /auth/register:
-    post:
-      $ref: ../swagger/paths/auth/register.yaml
-  /auth/login:
-    post:
-      $ref: ../swagger/paths/auth/login.yaml
-  /auth/refresh:
-    post:
-      $ref: ../swagger/paths/auth/refresh.yaml
-  /auth/logout:
-    post:
-      $ref: ../swagger/paths/auth/logout.yaml
-  /auth/send-reset-email:
-    post:
-      $ref: ../swagger/paths/auth/sendResetEmail.yaml
-  /auth/reset-pwd:
-    post:
-      $ref: ../swagger/paths/auth/resetPwd.yaml
 components:
   securitySchemes:
     bearerAuth:

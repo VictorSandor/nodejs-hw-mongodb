@@ -7,34 +7,45 @@ required:
   - userId
 properties:
   _id:
-    description: 'contacts id'
+    description: "Contacts's id"
     type: string
-    example: 675c8399c0dd8a4ccbe173fd
+    example: '676163008cee5d8583a961a4'
   name:
-    description: 'contacts name'
+    description: "Contacts's name"
     type: string
-    example: 'John Doe'
+    example: 'Vitalii'
   phoneNumber:
-    description: 'contacts phoneNumber'
-    type: number
-    example: +380672222222
-  isFavourite:
-    description: 'contacts favourite status'
-    type: boolean
-    example: true
-  email:
-    description: 'Contact email address'
+    description: "Contact's phone"
     type: string
-    example: john.doe@example.com
+    example: '+3809700000000'
+  email:
+    description: "Contact's email"
+    type: string
+    example: 'johndoe@gmail.com'
   contactType:
-    description: 'contacts type'
+    description: "Contact's type"
     type: string
     enum: ['work', 'home', 'personal']
-  photo:
-    description: 'Link to contacts photo'
-    type: string
-    example: https://res.cloudinary.com/uqwgdu/image/upload/image.png
+    example: 'work'
   userId:
-    description: 'ID of the user who owns this contact'
+    description: "Contact's user id"
     type: string
-    example: 123e4567-e89b-12d3-a456-426614174000
+    example: 67600db56af6ff87cfb44dce
+  photo:
+    description: "Contact's photo"
+    type: string
+    example: https://res.cloudinary.com/drmqponzf/image/upload/v1734435583/iwl0vrmfkhwldqu4byxd.jpg
+  createdAt:
+    description: 'Timestamp when the contact was created'
+    type: string
+    format: date-time
+    example: 2024-12-14T12:28:14.781Z
+  updatedAt:
+    description: 'Timestamp when the contact was last updated'
+    type: string
+    format: date-time
+    example: 2024-12-15T09:27:36.051Z
+  __v:
+    description: Version application
+    type: string
+    example: 0

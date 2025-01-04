@@ -1,44 +1,38 @@
-import createHttpError from "http-errors";
-import { SessionCollection } from "../db/models/session.js";
-import { UsersCollection } from "../db/models/user.js";
+import createHttpError from 'http-errors';
 
-export const authenticate = async (req, res, next) => {
-  const authHeader = req.get("Authorization");
+import { SessionsCollection } from '../db/models/session.js';
+import { UsersCollection } from '../db/models/user.js';
 
-  if (!authHeader) {
-    next(createHttpError(401, "Please, provide Authorization header"));
-    return;
+export async function authenticate(req, res, next) {
+  const { authorization } = req.headers;
+
+  if (typeof authorization !== 'string') {
+    return next(createHttpError(401, 'Please provide Authorization header'));
   }
 
-  const [bearer, token] = authHeader.split(" ");
+  const [bearer, accessToken] = authorization.split(' ', 2);
 
-  if (bearer !== "Bearer" || !token) {
-    next(createHttpError(401, "Auth header should be of type Bearer"));
-    return;
+  if (bearer !== 'Bearer' || typeof accessToken !== 'string') {
+    return next(createHttpError(401, 'Auth header should be of type Bearer'));
   }
 
-  const session = await SessionCollection.findOne({ accessToken: token });
+  const session = await SessionsCollection.findOne({ accessToken });
 
-  if (!session) {
-    next(createHttpError(401, "Session not found"));
-    return;
+  if (session === null) {
+    return next(createHttpError(401, 'Session not found'));
   }
 
-  const isExpiredToken = new Date() > new Date(session.accessTokenValidUntil);
-
-  if (isExpiredToken) {
-    next(createHttpError(401, "Access token expired"));
-    return;
+  if (session.accessTokenValidUntil < new Date()) {
+    return next(createHttpError(401, 'Access token is expired'));
   }
 
-  const user = await UsersCollection.findOne({ _id: session.userId });
+  const user = await UsersCollection.findById(session.userId);
 
-  if (!user) {
-    next(createHttpError(401, "User not found"));
-    return;
+  if (user === null) {
+    return next(createHttpError(401, 'User not found'));
   }
 
-  req.user = user;
+  req.user = { id: user._id, name: user.name };
 
   next();
-};
+}

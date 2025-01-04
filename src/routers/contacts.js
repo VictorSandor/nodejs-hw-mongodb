@@ -1,64 +1,58 @@
-import { Router } from "express";
 import express from "express";
 import {
   createContactController,
   deleteContactController,
   getContactByIdController,
   getContactsController,
-  updateContactController,
+  patchContactController,
+  upsertContactController,
 } from "../controllers/contacts.js";
-
+import { ctrlWrapper } from "../utils/ctrlWrapper.js";
 import {
   createContactSchema,
   updateContactSchema,
 } from "../validation/contacts.js";
-
-import { ctrlWrapper } from "../utils/ctrlWrapper.js";
-import { isValidId } from "../middlewares/isValidId.js";
 import { validateBody } from "../middlewares/validateBody.js";
-import { authorization } from "../middlewares/authorization.js";
+import { isValidId } from "../middlewares/isValidId.js";
+import { upload } from "../middlewares/multer.js";
 
-import { authenticate } from "../middlewares/authenticate.js";
-import { upload } from "../middlewares/upload.js";
-
+const router = express.Router();
 const jsonParser = express.json();
-const router = Router();
 
-router.use(authenticate);
-router.get("/", authenticate, ctrlWrapper(getContactsController));
-router.use(authorization);
+router.get("/", ctrlWrapper(getContactsController));
 
-router.get(
-  "/:contactId",
-  authenticate,
-  isValidId,
-  ctrlWrapper(getContactByIdController)
-);
+router.get("/:contactId", isValidId, ctrlWrapper(getContactByIdController));
 
 router.post(
   "/",
   upload.single("photo"),
-  authenticate,
   jsonParser,
   validateBody(createContactSchema),
   ctrlWrapper(createContactController)
 );
 
-router.delete(
+router.post(
+  "/register",
+  validateBody(createContactSchema),
+  ctrlWrapper(createContactController)
+);
+
+router.delete("/:contactId", isValidId, ctrlWrapper(deleteContactController));
+
+router.put(
   "/:contactId",
-  authenticate,
   isValidId,
-  ctrlWrapper(deleteContactController)
+  upload.single("photo"),
+  validateBody(createContactSchema),
+  ctrlWrapper(upsertContactController)
 );
 
 router.patch(
   "/:contactId",
-  upload.single("photo"),
-  authenticate,
   isValidId,
-  jsonParser,
+  upload.single("photo"),
   validateBody(updateContactSchema),
-  ctrlWrapper(updateContactController)
+  ctrlWrapper(patchContactController)
 );
 
 export default router;

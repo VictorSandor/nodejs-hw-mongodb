@@ -1,14 +1,14 @@
-import multer from "multer";
+import multer from 'multer';
 
-import { TEMP_UPLOAD_DIR } from "../constants/index.js";
+import { TEMP_UPLOAD_DIR } from '../constants/index.js';
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, TEMP_UPLOAD_DIR);
   },
   filename: function (req, file, cb) {
-    const uniquePrefics = Date.now();
-    cb(null, `${uniquePrefics}_${file.originalname}`);
+    const uniqueSuffix = Date.now();
+    cb(null, `${uniqueSuffix}_${file.originalname}`);
   },
 });
 

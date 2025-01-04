@@ -2,7 +2,7 @@ tags:
   - Contacts
 summary: Get list of contacts
 operationId: getContacts
-description: 'Get list of contacts'
+description: 'Get list of users with this endpoint'
 security:
   - bearerAuth: []
 parameters:
@@ -15,13 +15,13 @@ parameters:
     name: perPage
     schema:
       type: integer
-      example: 10
+      example: 5
   - in: query
     name: sortBy
     schema:
-      enum:
-        ['_id', 'name', 'phoneNumber', 'email', 'isFavourite', 'contactType']
+      type: string
       example: 'name'
+    description: "All student's fields can be mentioned. Default value - _id"
   - in: query
     name: sortOrder
     schema:
@@ -29,19 +29,20 @@ parameters:
       enum: ['asc', 'desc']
       example: 'asc'
   - in: query
-    name: isFavourite
-    schema:
-      type: boolean
-      example: true
-  - in: query
     name: contactType
     schema:
       type: string
       enum: ['work', 'home', 'personal']
-      example: work
+      example: 'work'
+  - in: query
+    name: IsFavourite
+    schema:
+      type: string
+      example: 'true'
+
 responses:
   '200':
-    description: Successfully found contacts
+    description: Successfully found contacts!
     content:
       application/json:
         schema:
@@ -56,7 +57,7 @@ responses:
               example: 200
             message:
               type: string
-              example: Successfully found contacts
+              example: Successfully found contacts!
             data:
               type: object
               required:
@@ -74,16 +75,16 @@ responses:
                     $ref: ../../components/schemas/contact.yaml
                 page:
                   type: number
-                  example: 1
+                  example: 2
                 perPage:
                   type: number
-                  example: 3
+                  example: 4
                 totalItems:
                   type: number
-                  example: 2
+                  example: 4
                 totalPages:
                   type: number
-                  example: 2
+                  example: 4
                 hasNextPage:
                   type: boolean
                   example: false
@@ -91,4 +92,6 @@ responses:
                   type: boolean
                   example: true
   '401':
-    $ref: ../../components/responses/contacts/401.yaml
+    $ref: '../../components/responses/401.yaml'
+  '500':
+    $ref: ../../components/responses/500.yaml

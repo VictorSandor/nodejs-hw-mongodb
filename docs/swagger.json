@@ -2,36 +2,137 @@
   "openapi": "3.1.0",
   "info": {
     "version": "1.0.0",
-    "title": "Contacts app",
+    "title": "Contacts",
     "license": {
       "name": "Apache 2.0",
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "description": "This is a documentation of contacts app"
+    "description": "This is a documentation of Contacts"
   },
   "servers": [
     {
-      "url": "https://nodejs-hw-mongodb-35-jbtk.onrender.com"
+      "url": "http://127.0.0.1:3000"
     },
     {
-      "url": "http://localhost:3000"
+      "url": "https://nodejs-hw-mongodb-35-jbtk.onrender.com"
     }
   ],
   "tags": [
     {
       "name": "Contacts",
-      "description": "Operations with contacts"
+      "description": "Operation with contacts"
     }
   ],
   "paths": {
     "/contacts": {
+      "post": {
+        "tags": [
+          "Contacts"
+        ],
+        "summary": "Create contact",
+        "operationId": "createContact",
+        "description": "Create a contact with payload",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "phoneNumber",
+                  "contactType"
+                ],
+                "properties": {
+                  "name": {
+                    "description": "Contact's name",
+                    "type": "string",
+                    "example": "John Doe"
+                  },
+                  "phoneNumber": {
+                    "description": "Contact's phone number",
+                    "type": "string",
+                    "example": "+3809700000000"
+                  },
+                  "email": {
+                    "description": "Contact's email",
+                    "type": "string",
+                    "example": "johndoe@gmail.com"
+                  },
+                  "isFavourite": {
+                    "description": "Favorite contact",
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "contactType": {
+                    "description": "Contact type",
+                    "type": "string",
+                    "enum": [
+                      "work",
+                      "home",
+                      "personal"
+                    ],
+                    "example": "work"
+                  },
+                  "photo": {
+                    "description": "Contact's photo",
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Contact created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 201
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully created a contact!"
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/contact"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
       "get": {
         "tags": [
           "Contacts"
         ],
         "summary": "Get list of contacts",
         "operationId": "getContacts",
-        "description": "Get list of contacts",
+        "description": "Get list of users with this endpoint",
         "security": [
           {
             "bearerAuth": []
@@ -51,23 +152,17 @@
             "name": "perPage",
             "schema": {
               "type": "integer",
-              "example": 10
+              "example": 5
             }
           },
           {
             "in": "query",
             "name": "sortBy",
             "schema": {
-              "enum": [
-                "_id",
-                "name",
-                "phoneNumber",
-                "email",
-                "isFavourite",
-                "contactType"
-              ],
+              "type": "string",
               "example": "name"
-            }
+            },
+            "description": "All student's fields can be mentioned. Default value - _id"
           },
           {
             "in": "query",
@@ -83,14 +178,6 @@
           },
           {
             "in": "query",
-            "name": "isFavourite",
-            "schema": {
-              "type": "boolean",
-              "example": true
-            }
-          },
-          {
-            "in": "query",
             "name": "contactType",
             "schema": {
               "type": "string",
@@ -101,11 +188,19 @@
               ],
               "example": "work"
             }
+          },
+          {
+            "in": "query",
+            "name": "IsFavourite",
+            "schema": {
+              "type": "string",
+              "example": "true"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "Successfully found contacts",
+            "description": "Successfully found contacts!",
             "content": {
               "application/json": {
                 "schema": {
@@ -122,7 +217,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Successfully found contacts"
+                      "example": "Successfully found contacts!"
                     },
                     "data": {
                       "type": "object",
@@ -144,19 +239,19 @@
                         },
                         "page": {
                           "type": "number",
-                          "example": 1
+                          "example": 2
                         },
                         "perPage": {
                           "type": "number",
-                          "example": 3
+                          "example": 4
                         },
                         "totalItems": {
                           "type": "number",
-                          "example": 2
+                          "example": 4
                         },
                         "totalPages": {
                           "type": "number",
-                          "example": 2
+                          "example": 4
                         },
                         "hasNextPage": {
                           "type": "boolean",
@@ -175,103 +270,9 @@
           },
           "401": {
             "$ref": "#/components/responses/401"
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Contacts"
-        ],
-        "summary": "Create contact",
-        "operationId": "createContacts",
-        "description": "Create a contact",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "name",
-                  "phoneNumber",
-                  "contactType"
-                ],
-                "properties": {
-                  "name": {
-                    "description": "Contacts name",
-                    "type": "string",
-                    "example": "Will"
-                  },
-                  "phoneNumber": {
-                    "description": "Contacts phone number",
-                    "type": "string",
-                    "example": 380672222222
-                  },
-                  "email": {
-                    "description": "Contacts email",
-                    "type": "string",
-                    "example": "example@gmail.com"
-                  },
-                  "isFavourite": {
-                    "description": "Contact favourite status",
-                    "type": "boolean",
-                    "example": false
-                  },
-                  "contactType": {
-                    "description": "Type of contact",
-                    "type": "string",
-                    "enum": [
-                      "work",
-                      "home",
-                      "personal"
-                    ]
-                  },
-                  "photo": {
-                    "description": "Contacts photo",
-                    "type": "string",
-                    "format": "binary"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Creates a contact",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "status",
-                    "message",
-                    "data"
-                  ],
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Successfully created a contact"
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/contact"
-                    }
-                  }
-                }
-              }
-            }
           },
-          "401": {
-            "$ref": "#/components/responses/401"
+          "500": {
+            "$ref": "#/components/responses/500"
           }
         }
       }
@@ -296,13 +297,13 @@
             "required": true,
             "schema": {
               "type": "string",
-              "example": "65ca67e7ae7f10c88b598384"
+              "example": "676163008cee5d8583a961a4"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Get contact by contactId",
+            "description": "Get contact by id",
             "content": {
               "application/json": {
                 "schema": {
@@ -319,7 +320,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Successfully found contact with id 65ca67e7ae7f10c88b598384!"
+                      "example": "Successfully found contact with id 676163008cee5d8583a961a4!"
                     },
                     "data": {
                       "type": "object",
@@ -335,6 +336,48 @@
           },
           "404": {
             "$ref": "#/components/responses/404"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Contacts"
+        ],
+        "summary": "Delete contact by ID",
+        "operationId": "deleteContact",
+        "description": "Deletes a contact by its unique ID.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "contactId",
+            "description": "The unique ID of the contact to delete.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "676163008cee5d8583a961a4"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
           }
         }
       },
@@ -342,9 +385,9 @@
         "tags": [
           "Contacts"
         ],
-        "summary": "Update contact",
-        "operationId": "updateContacts",
-        "description": "Update a contact",
+        "summary": "Update contact by ID",
+        "operationId": "updateContactById",
+        "description": "Update an existing contact by its ID with the provided payload",
         "security": [
           {
             "bearerAuth": []
@@ -355,9 +398,10 @@
             "in": "path",
             "name": "contactId",
             "required": true,
+            "description": "ID of the contact to update",
             "schema": {
               "type": "string",
-              "example": "65ca67e7ae7f10c88b598384"
+              "example": "676163008cee5d8583a961a4"
             }
           }
         ],
@@ -368,36 +412,37 @@
                 "type": "object",
                 "properties": {
                   "name": {
-                    "description": "Contacts name",
+                    "description": "Contact's name",
                     "type": "string",
                     "example": "John Doe"
                   },
                   "phoneNumber": {
-                    "description": "Contacts phone number",
+                    "description": "Contact's phone number",
                     "type": "string",
-                    "example": "1234567890"
+                    "example": "+3809700000000"
                   },
                   "email": {
-                    "description": "Contacts email",
+                    "description": "Contact's email",
                     "type": "string",
-                    "example": "example@gmail.com"
+                    "example": "johndoe@gmail.com"
                   },
                   "isFavourite": {
-                    "description": "Contacts favourite status",
+                    "description": "Favorite contact",
                     "type": "boolean",
                     "example": false
                   },
                   "contactType": {
-                    "description": "Type of contact",
+                    "description": "Contact type",
                     "type": "string",
                     "enum": [
                       "work",
                       "home",
                       "personal"
-                    ]
+                    ],
+                    "example": "work"
                   },
                   "photo": {
-                    "description": "Conatcs photo",
+                    "description": "Contact's photo",
                     "type": "string",
                     "format": "binary"
                   }
@@ -408,7 +453,7 @@
         },
         "responses": {
           "200": {
-            "description": "Updates a contact",
+            "description": "Contact updated successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -425,7 +470,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Successfully updated a contact!"
+                      "example": "Successfully updated the contact!"
                     },
                     "data": {
                       "type": "object",
@@ -441,459 +486,6 @@
           },
           "404": {
             "$ref": "#/components/responses/404"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Contacts"
-        ],
-        "summary": "Delete contact by id",
-        "operationId": "deleteContact",
-        "description": "Delete contact",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "contactId",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "example": "65ca67e7ae7f10c88b598384"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Delete contact by contactId",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "status",
-                    "message",
-                    "data"
-                  ],
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 204
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Successfully deleted contact with id 65ca67e7ae7f10c88b598384"
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/contact"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
-          "404": {
-            "$ref": "#/components/responses/404"
-          }
-        }
-      }
-    },
-    "/auth/register": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "Register user",
-        "operationId": "registerUser",
-        "description": "Register User",
-        "security": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "name",
-                  "email",
-                  "password"
-                ],
-                "properties": {
-                  "name": {
-                    "description": "User name",
-                    "type": "string",
-                    "example": "John Doe"
-                  },
-                  "email": {
-                    "description": "User email",
-                    "type": "string",
-                    "example": "john.doe@example.com"
-                  },
-                  "password": {
-                    "description": "User password",
-                    "type": "string",
-                    "example": "12345pasS"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Creates a user",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "status",
-                    "message",
-                    "data"
-                  ],
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 201
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Successfully registered a user!"
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/user"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "409": {
-            "$ref": "#/components/responses/409"
-          },
-          "500": {
-            "$ref": "#/components/responses/500"
-          }
-        }
-      }
-    },
-    "/auth/login": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "Login user",
-        "operationId": "loginUser",
-        "description": "Login User",
-        "security": [],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "email",
-                  "password"
-                ],
-                "properties": {
-                  "email": {
-                    "description": "User email",
-                    "type": "string",
-                    "example": "john.doe@example.com"
-                  },
-                  "password": {
-                    "description": "User password",
-                    "type": "string",
-                    "example": "12345pasS"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Logged in an user",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "status",
-                    "message",
-                    "data"
-                  ],
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Successfully logged in an user!"
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "accessToken": {
-                          "description": "Access token",
-                          "type": "string",
-                          "example": "TDn5k6dfU2zkjG4W6WW0NQJ2Vgl8QkGORZcGIK"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/401-2"
-          },
-          "500": {
-            "$ref": "#/components/responses/500"
-          }
-        }
-      }
-    },
-    "/auth/refresh": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "Refresh user token",
-        "operationId": "refreshUser",
-        "description": "Refresh User session",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-      
-        ],
-        "responses": {
-          "200": {
-            "description": "Refresh user token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "status",
-                    "message",
-                    "data"
-                  ],
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Successfully refreshed a session"
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "accessToken": {
-                          "description": "Access token",
-                          "type": "string",
-                          "example": "TDn5k6dfU2zkjG4W6WW0NQJ2Vgl8QkGORZcGIK"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/401-2"
-          },
-          "404": {
-            "$ref": "#/components/responses/404-2"
-          },
-          "500": {
-            "$ref": "#/components/responses/500"
-          }
-        }
-      }
-    },
-    "/auth/logout": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "Logout user",
-        "operationId": "logoutUser",
-        "description": "Logout User session",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Successful Logout. Response does not contain a body."
-          },
-          "401": {
-            "$ref": "#/components/responses/401-2"
-          },
-          "404": {
-            "$ref": "#/components/responses/404-2"
-          },
-          "500": {
-            "$ref": "#/components/responses/500"
-          }
-        }
-      }
-    },
-    "/auth/send-reset-email": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "Request email change password",
-        "operationId": "requestReset",
-        "description": "Request email change password",
-        "security": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "email"
-                ],
-                "properties": {
-                  "email": {
-                    "description": "User email",
-                    "type": "string",
-                    "example": "john.doe@example.com"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Request reset password",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "status",
-                    "message",
-                    "data"
-                  ],
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Reset password email has been successfully sent."
-                    },
-                    "data": {
-                      "type": "object",
-                      "description": "empty object"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "$ref": "#/components/responses/404-2"
-          },
-          "500": {
-            "$ref": "#/components/responses/500"
-          }
-        }
-      }
-    },
-    "/auth/reset-pwd": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "Reset password",
-        "operationId": "requestPassword",
-        "description": "Reset password",
-        "security": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "token",
-                  "password"
-                ],
-                "properties": {
-                  "token": {
-                    "description": "JWT token received via email for password reset.",
-                    "type": "string",
-                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiZW1haWwiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNjcxMjM4ODAwfQ.wyDIz8nMKvXOpGfRmlCVJrU11A1IwFT4-NMIszq8R4o"
-                  },
-                  "password": {
-                    "description": "The new password for the user.",
-                    "type": "string",
-                    "example": "NewSecureP@ssw0rd"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Request reset password",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "status",
-                    "message",
-                    "data"
-                  ],
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Password has been successfully reset"
-                    },
-                    "data": {
-                      "type": "object",
-                      "description": "empty object"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/401-2"
-          },
-          "404": {
-            "$ref": "#/components/responses/404-2"
           },
           "500": {
             "$ref": "#/components/responses/500"
@@ -921,101 +513,69 @@
         ],
         "properties": {
           "_id": {
-            "description": "contacts id",
+            "description": "Contacts's id",
             "type": "string",
-            "example": "675c8399c0dd8a4ccbe173fd"
+            "example": "676163008cee5d8583a961a4"
           },
           "name": {
-            "description": "contacts name",
+            "description": "Contacts's name",
             "type": "string",
-            "example": "John Doe"
+            "example": "Vitalii"
           },
           "phoneNumber": {
-            "description": "contacts phoneNumber",
-            "type": "number",
-            "example": 380672222222
-          },
-          "isFavourite": {
-            "description": "contacts favourite status",
-            "type": "boolean",
-            "example": true
+            "description": "Contact's phone",
+            "type": "string",
+            "example": "+3809700000000"
           },
           "email": {
-            "description": "Contact email address",
+            "description": "Contact's email",
             "type": "string",
-            "example": "john.doe@example.com"
+            "example": "johndoe@gmail.com"
           },
           "contactType": {
-            "description": "contacts type",
+            "description": "Contact's type",
             "type": "string",
             "enum": [
               "work",
               "home",
               "personal"
-            ]
-          },
-          "photo": {
-            "description": "Link to contacts photo",
-            "type": "string",
-            "example": "https://res.cloudinary.com/uqwgdu/image/upload/image.png"
+            ],
+            "example": "work"
           },
           "userId": {
-            "description": "ID of the user who owns this contact",
+            "description": "Contact's user id",
             "type": "string",
-            "example": "123e4567-e89b-12d3-a456-426614174000"
-          }
-        }
-      },
-      "user": {
-        "type": "object",
-        "required": [
-          "_id",
-          "name",
-          "email",
-          "password"
-        ],
-        "properties": {
-          "_id": {
-            "description": "User id",
-            "type": "string",
-            "example": "675c8399c0dd8a4ccbe173fd"
+            "example": "67600db56af6ff87cfb44dce"
           },
-          "name": {
-            "description": "user full name",
+          "photo": {
+            "description": "Contact's photo",
             "type": "string",
-            "example": "John Doe"
-          },
-          "email": {
-            "description": "User email",
-            "type": "string",
-            "example": "john.doe@example.com"
-          },
-          "password": {
-            "description": "Hashed user password stored in the database",
-            "type": "string",
-            "example": "$2b$10$ehfmT7JR9ypYhpGViQeeY.IeBX46h7r8IC5S0Xl2Q6UQ2Thn49gDS"
-          },
-          "role": {
-            "description": "User role",
-            "type": "string",
-            "enum": [
-              "user"
-            ]
+            "example": "https://res.cloudinary.com/drmqponzf/image/upload/v1734435583/iwl0vrmfkhwldqu4byxd.jpg"
           },
           "createdAt": {
-            "description": "Contacts createdAt",
+            "description": "Timestamp when the contact was created",
             "type": "string",
-            "example": "2024-05-08T16:12:14.954182"
+            "format": "date-time",
+            "example": "2024-12-14T12:28:14.781Z"
           },
-          "updateAt": {
-            "description": "Contacts updatedAt",
+          "updatedAt": {
+            "description": "Timestamp when the contact was last updated",
             "type": "string",
-            "example": "2024-11-30T17:19:41.576+00:00"
+            "format": "date-time",
+            "example": "2024-12-15T09:27:36.051Z"
+          },
+          "__v": {
+            "description": "Version application",
+            "type": "string",
+            "example": 0
           }
         }
       }
     },
     "responses": {
+      "204": {
+        "description": "Contact successfully deleted. No content is returned."
+      },
       "401": {
         "description": "Unauthorized Error",
         "content": {
@@ -1054,15 +614,14 @@
         }
       },
       "404": {
-        "description": "Not found error",
+        "description": "Contact not found.",
         "content": {
           "application/json": {
             "schema": {
               "type": "object",
               "required": [
                 "status",
-                "message",
-                "data"
+                "message"
               ],
               "properties": {
                 "status": {
@@ -1071,56 +630,7 @@
                 },
                 "message": {
                   "type": "string",
-                  "example": "NotFoundError"
-                },
-                "data": {
-                  "type": "object",
-                  "required": [
-                    "message"
-                  ],
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Contact not found"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "409": {
-        "description": "Conflict",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "required": [
-                "status",
-                "message",
-                "data"
-              ],
-              "properties": {
-                "status": {
-                  "type": "integer",
-                  "example": 409
-                },
-                "message": {
-                  "type": "string",
-                  "example": "ConflictError"
-                },
-                "data": {
-                  "type": "object",
-                  "required": [
-                    "message"
-                  ],
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Email in use"
-                    }
-                  }
+                  "example": "Contact not found"
                 }
               }
             }
@@ -1156,80 +666,6 @@
                     "message": {
                       "type": "string",
                       "example": "Internal Server Error"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "401-2": {
-        "description": "Unauthorized error",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "required": [
-                "status",
-                "message",
-                "data"
-              ],
-              "properties": {
-                "status": {
-                  "type": "integer",
-                  "example": 401
-                },
-                "message": {
-                  "type": "string",
-                  "example": "UnauthorizedError"
-                },
-                "data": {
-                  "type": "object",
-                  "required": [
-                    "message"
-                  ],
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Session not found."
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "404-2": {
-        "description": "NotFound error",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "required": [
-                "status",
-                "message",
-                "data"
-              ],
-              "properties": {
-                "status": {
-                  "type": "integer",
-                  "example": 404
-                },
-                "message": {
-                  "type": "string",
-                  "example": "NotFoundError"
-                },
-                "data": {
-                  "type": "object",
-                  "required": [
-                    "message"
-                  ],
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "User not found"
                     }
                   }
                 }

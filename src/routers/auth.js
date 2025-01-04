@@ -1,71 +1,51 @@
-import { Router } from "express";
-import express from "express";
-
-import { ctrlWrapper } from "../utils/ctrlWrapper.js";
-import {
-  loginWithGoogleOAuthSchema,
-  registerUserSchema,
-  resetPasswordSchema,
-} from "../validation/auth.js";
-import {
-  getGoogleOAuthUrlController,
-  loginWithGoogleController,
-  registerUserController,
-  requestResetEmailController,
-  resetPasswordController,
-} from "../controllers/auth.js";
-import { loginUserController } from "../controllers/auth.js";
-import { logoutUserController } from "../controllers/auth.js";
-
-import { refreshUserSessionController } from "../controllers/auth.js";
-
+import express from 'express';
+import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import {
   loginUserSchema,
+  registerUserSchema,
   requestResetEmailSchema,
-} from "../validation/auth.js";
-import { validateBody } from "../middlewares/validateBody.js";
+  resetPasswordSchema,
+} from '../validation/auth.js';
+import {
+  loginUserController,
+  logoutUserController,
+  refreshUserSessionController,
+  registerUserController,
+  resetPasswordController,
+} from '../controllers/auth.js';
+import { validateBody } from '../middlewares/validateBody.js';
+import { requestResetEmailController } from '../controllers/contacts.js';
 
+const router = express.Router();
 const jsonParser = express.json();
-const router = Router();
 
 router.post(
-  "/register",
+  '/register',
   jsonParser,
   validateBody(registerUserSchema),
-  ctrlWrapper(registerUserController)
+  ctrlWrapper(registerUserController),
 );
 
 router.post(
-  "/login",
-  jsonParser,
+  '/login',
   validateBody(loginUserSchema),
-  ctrlWrapper(loginUserController)
+  ctrlWrapper(loginUserController),
 );
 
-router.post("/refresh", ctrlWrapper(refreshUserSessionController));
+router.post('/logout', ctrlWrapper(logoutUserController));
 
-router.post("/logout", ctrlWrapper(logoutUserController));
+router.post('/refresh', ctrlWrapper(refreshUserSessionController));
 
 router.post(
-  "/send-reset-email",
-  jsonParser,
+  '/send-reset-email',
   validateBody(requestResetEmailSchema),
-  ctrlWrapper(requestResetEmailController)
+  ctrlWrapper(requestResetEmailController),
 );
 
 router.post(
-  "/reset-pwd",
-  jsonParser,
+  '/reset-pwd',
   validateBody(resetPasswordSchema),
-  ctrlWrapper(resetPasswordController)
-);
-
-router.get("/get-oauth-url", ctrlWrapper(getGoogleOAuthUrlController));
-
-router.post(
-  "/confirm-oauth",
-  validateBody(loginWithGoogleOAuthSchema),
-  ctrlWrapper(loginWithGoogleController)
+  ctrlWrapper(resetPasswordController),
 );
 
 export default router;
