@@ -1,17 +1,27 @@
 import { Schema, model } from "mongoose";
 import bcrypt from "bcrypt";
+import { ROLES } from "../../constants/index.js";
 
 const userSchema = new Schema(
   {
-    name: { type: String, required: true },
-    email: {
+    name: {
       type: String,
       required: true,
-      unique: true,
-      match: [/^\S+@\S+\.\S+$/, "Invalid email format"],
     },
-    password: { type: String, required: true },
-    optionalField: { type: String, required: false },
+    email: {
+      type: String,
+      unique: true,
+      required: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    role: {
+      type: String,
+      enum: [ROLES.USER],
+      default: ROLES.USER,
+    },
   },
   { timestamps: true, versionKey: false }
 );
